@@ -1,0 +1,112 @@
+<html>
+<head>
+<script src="js/buffer-loader.js"></script>
+<script src="js/webaudio.js"></script>
+<script src="js/jquery-1.8.0.min.js"></script>
+<style type="text/css">
+
+input.range[type="range"] {
+  -webkit-appearance:none;
+  -moz-apperance:none;
+  background-color:#999;
+  margin:0.8em auto;
+  height:4px;
+}
+
+</style>
+</head>
+<body>
+	<input type="button" onClick="startLooping()" value="Start" />
+	<input type="button" onClick="stopLooping()" value="Stop" />
+	<br>
+	<input class="range" type="range" min="-1" max="9" value="0" /><br>
+	<input class="range" type="range" min="-1" max="9" value="2" /><br>
+	<input class="range" type="range" min="-1" max="9" value="1" /><br>
+	<input class="range" type="range" min="-1" max="9" value="2" /><br>
+	<input class="range" type="range" min="-1" max="9" value="-1" /><br>
+	<input class="range" type="range" min="-1" max="9" value="0" /><br>
+	<input class="range" type="range" min="-1" max="9" value="-1" /><br>
+	<script>
+	
+	// List of samples to load.
+	var sample_files = [
+		"media/t1_06.wav",
+		"media/t1_07.wav",
+		"media/t1_08.wav",
+		"media/t1_09.wav",
+		"media/t1_10.wav",
+		"media/t1_11.wav",
+		"media/t1_12.wav",
+		"media/t1_13.wav",
+		"media/t1_14.wav",
+		"media/t1_15.wav",
+	  ];
+	
+	var sliders = $('.range');
+	
+	function getFrameCount() {
+	  return sliders.length;
+	}
+	
+	var previous = null;
+	
+	function getFrameAt(index) {
+	  if (previous != null) {
+	    previous.css('background-color', '');
+	  }
+	  
+	  previous = $(sliders[index]);
+	  previous.css('background-color','#F00');
+	  
+	  return sliders[index].value;
+	}
+	
+	// Interval in milliseconds between frames.
+	var interval = 250;
+	
+	// ********************
+	// ********************
+	
+	// Current index within frames array.
+	var currentFrame = 0;
+	
+	// Reference to the looper interval.
+	var looper = null;
+
+	// Asynchronously load all the sample files.
+	for (var i = 0; i < sample_files.length; i++) {
+	  loadSoundAsync(i, sample_files[i]);
+	}
+    
+	// Starts playing frames.
+    function startLooping() {
+	  if (looper == null) {
+      	looper = setInterval("playNextFrame()", interval);
+	  }
+    }
+    
+	// Stops playing frames.
+    function stopLooping() {
+	  if (looper != null) {
+      	clearInterval(looper);
+      	looper = null;
+	  }
+    }
+    
+	// Plays a single frame and advances the frame position.
+    function playNextFrame() {
+      if (currentFrame >= getFrameCount()) {
+        currentFrame = 0;
+      }
+      
+      var soundIndex = getFrameAt(currentFrame++);
+      if (soundIndex >= 0) {
+        playSound(soundIndex);
+      }
+      
+      console.log("play " + soundIndex);
+    }
+    
+    </script>
+</body>
+</html>
