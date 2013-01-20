@@ -1,0 +1,32 @@
+<html>
+<head>
+<script src="js/buffer-loader.js"></script>
+<script src="js/webaudio.js"></script>
+<script src="js/jquery-1.8.0.min.js"></script>
+<script src="js/d3.v2.min.js"></script>
+<style type="text/css">
+
+input.range[type="range"] {
+  -webkit-appearance:none;
+  -moz-apperance:none;
+  background-color:#999;
+  margin:0.8em auto;
+  height:4px;
+}
+
+rect.current_frame {
+  fill: none;
+  stroke: none;
+  stroke-width: 1px;
+}
+
+</style>
+</head>
+<body>
+	<input type="button" onClick="startLooping()" value="Start" />
+	<input type="button" onClick="stopLooping()" value="Stop" />
+	<br>
+	<div id="sequencer"></div>
+    <script src='sequencer.js' type='text/javascript'></script>
+</body>
+</html>
