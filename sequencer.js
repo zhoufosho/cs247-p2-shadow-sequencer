@@ -96,17 +96,11 @@ for (var i = 0; i < sample_files.length; i++) {
   loadSoundAsync(i, sample_files[i]);
 }
 
-function toggleFrame(container, frames, frameNum, cellNum) {
-  
-  
-  console.log(frames[frameNum][cellNum]);
-  
-  renderFrames(container, frames);
-}
-
 function renderFrames(container, frames) {
   // Set up the sequencer visualization.
-  var columns = container.selectAll("g.frame").data(frames);
+  var columns = container
+    .selectAll("g.frame")
+    .data(frames);
   
   columns.enter()
     .append("g")
@@ -122,8 +116,10 @@ function renderFrames(container, frames) {
         .style("fill", "#99d")
         .style("fill-opacity", 0);
   
-  columns.each(function (d, frameNum) {
-      var cells = d3.select(this).selectAll("div.cell").data(d);
+  columns.each(function (frameData, frameNum) {
+      var cells = d3.select(this)
+        .selectAll("rect.cell")
+        .data(frameData);
       
       cells.enter()
         .append("rect")
@@ -139,9 +135,8 @@ function renderFrames(container, frames) {
             renderFrames(container, frames);
           });
       
-      // TODO: Animate this?
-      cells
-        .attr("fill", function (d, i) { return d ? "#d33" : "#ddd"; });
+      cells.filter(function (d) { return d; }).style("fill", "#d33");
+      cells.filter(function (d) { return !d; }).transition().style("fill", "#ddd");
     });
 }
 
