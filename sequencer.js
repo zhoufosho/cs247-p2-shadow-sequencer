@@ -26,19 +26,47 @@ var frames = [
 
 // List of samples to load.
 var sample_files = [
-  "media/t1_06.wav",
-  "media/t1_07.wav",
-  "media/t1_08.wav",
-  "media/t1_09.wav",
-  "media/t1_10.wav",
-  "media/t1_11.wav",
-  "media/t1_12.wav",
-  "media/t1_13.wav",
-  "media/t1_14.wav",
-  "media/t1_15.wav",
+    "media/Mildon Lite Piano 024 127.ogg",
+    "media/Mildon Lite Piano 031 127.ogg",
+    "media/Mildon Lite Piano 036 127.ogg",
+    "media/Mildon Lite Piano 038 127.ogg",
+    "media/Mildon Lite Piano 040 127.ogg",
+    "media/Mildon Lite Piano 041 127.ogg",
+    "media/Mildon Lite Piano 043 127.ogg",
+    "media/Mildon Lite Piano 045 127.ogg",
+    "media/Mildon Lite Piano 047 127.ogg",
+    "media/Mildon Lite Piano 048 127.ogg",
+    "media/Mildon Lite Piano 050 127.ogg",
+    "media/Mildon Lite Piano 052 127.ogg",
+    "media/Mildon Lite Piano 053 127.ogg",
+    "media/Mildon Lite Piano 055 127.ogg",
+    "media/Mildon Lite Piano 057 127.ogg",
+    "media/Mildon Lite Piano 059 127.ogg",
+    "media/Mildon Lite Piano 060 127.ogg", // C4
+    "media/Mildon Lite Piano 062 127.ogg", // D4
+    "media/Mildon Lite Piano 064 127.ogg", // E4
+    "media/Mildon Lite Piano 065 127.ogg", // F4
+    "media/Mildon Lite Piano 067 127.ogg", // G4
+    "media/Mildon Lite Piano 069 127.ogg", // A4
+    "media/Mildon Lite Piano 071 127.ogg", // B4
+    "media/Mildon Lite Piano 072 127.ogg",
+    "media/Mildon Lite Piano 074 127.ogg",
+    "media/Mildon Lite Piano 076 127.ogg",
+    "media/Mildon Lite Piano 077 127.ogg",
+    "media/Mildon Lite Piano 079 127.ogg",
+    "media/Mildon Lite Piano 081 127.ogg",
+    "media/Mildon Lite Piano 083 127.ogg",
+    "media/Mildon Lite Piano 084 127.ogg",
+    "media/Mildon Lite Piano 089 127.ogg",
+    "media/Mildon Lite Piano 095 127.ogg",
   ];
 
-var interval = 250;
+// Select just the notes we need.
+sample_files = sample_files.slice(15, 25).reverse();
+
+var bpm = 95;
+var tempo = 4;
+var interval = (3600 / bpm) * tempo;
 
 function translate(x, y) {
   return "translate(" + x + ", " + y + ")";
