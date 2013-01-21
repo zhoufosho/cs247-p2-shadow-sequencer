@@ -1,10 +1,4 @@
-var width = 640,
-    height = 480;
-
-var svg = d3.select("div#sequencer")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
+var playFirstNote = true;
 
 var frames = [
     [0,1,1,1,0,0,0,0,0,0],
@@ -66,6 +60,20 @@ var bpm = 95;
 var tempo = 4;
 var interval = (3600 / bpm) * tempo;
 
+var width = 640;
+var height = 480;
+
+var svg = d3.select("div#sequencer")
+  .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+// Threshold for considering a cell "on".
+var threshValue = 0;
+
+// Maximum value for a cell.
+var maxValue = 0;
+
 function translate(x, y) {
   return "translate(" + x + ", " + y + ")";
 }
@@ -104,12 +112,14 @@ function playNextFrame() {
   currentFrameSvg = d3.select("#frame_" + currentFrame);
   currentFrameSvg.style("fill-opacity", 1.0);
 
-  console.log(frames);
-
   var frame = frames[currentFrame];
   for (var i = 0; i < frame.length; i++) {
-    if (frame[i] > (blockSize * blockSize / 2)) {
+    if (frame[i] >= threshValue) {
       playSound(i);
+
+      if (playFirstNote) {
+        break;
+      }
     }
   }
 
@@ -125,6 +135,10 @@ for (var i = 0; i < sample_files.length; i++) {
 }
 
 function renderFrames(container, frames) {
+  // TODO: These shouldn't chage once they're set...
+  maxValue = (blockSize * blockSize);
+  threshValue = (maxValue / 2);
+
   // Set up the sequencer visualization.
   var columns = container
     .selectAll("g.frame")
@@ -157,14 +171,22 @@ function renderFrames(container, frames) {
           .attr("y", function (d, i) { return (i * cellHeight) + padding; })
           .attr("width", columnWidth - (padding * 2))
           .attr("height", cellHeight - (padding * 2))
-          .on("click", function(d, cellNum) {
-            // Toggle the cell, then re-render everything.
-            frames[frameNum][cellNum] = !frames[frameNum][cellNum];
-            renderFrames(container, frames);
-          });
+          .style("fill", "#ddd");
 
-      cells.filter(function (d) { return d; }).style("fill", "#d33");
-      cells.filter(function (d) { return !d; }).transition().style("fill", "#ddd");
+      cells.style("fill", function (d) {
+        var thresh = (d >= threshValue);
+        var r, g, b;
+
+        if (thresh) {
+          var volume = (d - threshValue) / (maxValue - threshValue);
+          r = Math.round(255 - (60 * volume));
+          g = b = Math.round(60 * volume);
+        } else {
+          r = g = b = 208;
+        }
+
+        return "rgb(" + r + ", " + g + ", " + b + ")";
+      });
     });
 }
 
@@ -185,15 +207,14 @@ function copyGridToFrames(grid) {
     }
   }
 
-  // Yay!
+  renderFrames(svg, frames);
 }
 
 
 function initializeSequencer() {
-  copyGridToFrames(blockGrid);
-
   columnWidth = (width / frames.length);
   cellHeight = (height / frames[0].length);
 
-  renderFrames(svg, blockGrid);
+  // This automatically draws the cells.
+  copyGridToFrames(blockGrid);
 }
