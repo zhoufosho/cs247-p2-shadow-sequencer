@@ -135,7 +135,17 @@ for (var i = 0; i < sample_files.length; i++) {
 }
 
 function renderFrames(container, frames) {
+  var sequencer = d3.select("div#sequencer");
+
+  width = sequencer.property("clientWidth");
+  height = sequencer.property("clientHeight");
+
+  container.attr("width", width);
+  container.attr("height", height);
+
   // TODO: These shouldn't chage once they're set...
+  columnWidth = (width / frames.length);
+  cellHeight = (height / frames[0].length);
   maxValue = (blockSize * blockSize);
   threshValue = (maxValue / 2);
 
@@ -212,9 +222,6 @@ function copyGridToFrames(grid) {
 
 
 function initializeSequencer() {
-  columnWidth = (width / frames.length);
-  cellHeight = (height / frames[0].length);
-
   // This automatically draws the cells.
   copyGridToFrames(blockGrid);
 }
