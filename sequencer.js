@@ -1,10 +1,5 @@
-var width = 600,
-    height = 600;
-
-var color = d3.scale.category20();
-var radius = d3.scale.sqrt().range([2,16]);
-
-var svgBars, svgNodes, svgLinks;
+var width = 640,
+    height = 480;
 
 var svg = d3.select("div#sequencer")
     .append("svg")
@@ -13,6 +8,9 @@ var svg = d3.select("div#sequencer")
 
 var frames = [
     [0,1,1,1,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -71,7 +69,7 @@ var interval = (3600 / bpm) * tempo;
 function translate(x, y) {
   return "translate(" + x + ", " + y + ")";
 }
-  
+
 // Starts playing frames.
 function startLooping() {
   if (looper == null) {
@@ -88,13 +86,13 @@ function stopLooping() {
 }
 
 var currentFrameSvg = null;
-  
+
 // Plays a single frame and advances the frame position.
 function playNextFrame() {
   if (currentFrame >= frames.length) {
     currentFrame = 0;
   }
-  
+
   if (currentFrameSvg != null) {
     currentFrameSvg
       .style("fill-opacity", 0.5)
@@ -102,17 +100,19 @@ function playNextFrame() {
         .duration(interval * (frames.length - 2))
         .style("fill-opacity", 0);
   }
-  
+
   currentFrameSvg = d3.select("#frame_" + currentFrame);
   currentFrameSvg.style("fill-opacity", 1.0);
-  
+
+  console.log(frames);
+
   var frame = frames[currentFrame];
   for (var i = 0; i < frame.length; i++) {
-    if (frame[i]) {
+    if (frame[i] > (blockSize * blockSize / 2)) {
       playSound(i);
     }
   }
-  
+
   currentFrame++;
 }
 
@@ -129,7 +129,7 @@ function renderFrames(container, frames) {
   var columns = container
     .selectAll("g.frame")
     .data(frames);
-  
+
   columns.enter()
     .append("g")
       .attr("class", "frame")
@@ -143,12 +143,12 @@ function renderFrames(container, frames) {
         .attr("height", height + (padding * 2))
         .style("fill", "#99d")
         .style("fill-opacity", 0);
-  
+
   columns.each(function (frameData, frameNum) {
       var cells = d3.select(this)
         .selectAll("rect.cell")
         .data(frameData);
-      
+
       cells.enter()
         .append("rect")
           .attr("class", "cell")
@@ -162,14 +162,38 @@ function renderFrames(container, frames) {
             frames[frameNum][cellNum] = !frames[frameNum][cellNum];
             renderFrames(container, frames);
           });
-      
+
       cells.filter(function (d) { return d; }).style("fill", "#d33");
       cells.filter(function (d) { return !d; }).transition().style("fill", "#ddd");
     });
 }
 
 var padding = 2;
-var columnWidth = (width / frames.length);
-var cellHeight = (height / frames[0].length);
 
-renderFrames(svg, frames);
+// Get filled out later...
+var columnWidth;
+var cellHeight;
+
+function copyGridToFrames(grid) {
+  frames = new Array(grid.length);
+
+  for (var y = 0; y < grid.length; y++) {
+    frames[y] = new Array(grid[y].length);
+
+    for (var x = 0; x < grid[y].length; x++) {
+      frames[y][x] = grid[y][x];
+    }
+  }
+
+  // Yay!
+}
+
+
+function initializeSequencer() {
+  copyGridToFrames(blockGrid);
+
+  columnWidth = (width / frames.length);
+  cellHeight = (height / frames[0].length);
+
+  renderFrames(svg, blockGrid);
+}

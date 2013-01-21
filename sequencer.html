@@ -4,6 +4,10 @@
 <script src="js/webaudio.js"></script>
 <script src="js/jquery-1.8.0.min.js"></script>
 <script src="js/d3.v2.min.js"></script>
+<script type='text/javascript' src='http://code.jquery.com/jquery-latest.min.js'></script>
+<script type='text/javascript' src='js/stackblur.js'></script>
+<script type="text/javascript" src="js/kinect.js"></script>
+<script type="text/javascript" src="js/shadowboxing.js"></script>
 <style type="text/css">
 
 input.range[type="range"] {
@@ -23,10 +27,15 @@ rect.current_frame {
 </style>
 </head>
 <body>
-	<input type="button" onClick="startLooping()" value="Start" />
-	<input type="button" onClick="stopLooping()" value="Stop" />
-	<br>
+    <div id="controls">
+		<input type="button" onClick="startLooping()" value="Start" />
+		<input type="button" onClick="stopLooping()" value="Stop" />
+	</div>
 	<div id="sequencer"></div>
+    <div id="capture">
+        <button id="background">Capture Background!</button>
+    </div>
     <script src='sequencer.js' type='text/javascript'></script>
+    <script src="shadowboxing-gridding-2.js" type="text/javascript"></script>
 </body>
 </html>

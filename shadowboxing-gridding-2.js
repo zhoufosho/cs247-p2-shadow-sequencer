@@ -34,6 +34,7 @@ var STACK_BLUR_RADIUS = 10;
  */
 var mediaStream, video, rawCanvas, rawContext, shadowCanvas, shadowContext, background = null;
 var kinect, kinectSocket = null; var blockContext;
+var blockSize;
 
 var boolGrid = null;
 var blockGrid = null;
@@ -47,6 +48,7 @@ $(document).ready(function() {
     initializeDOMElements();
     initializeBoolGrid();
     initializeBlockGrid();
+    initializeSequencer();
 
     $("#background").attr('disabled', true);
 	if (INPUT == "kinectdepth" || INPUT == "kinectrgb") {
@@ -235,6 +237,8 @@ function initializeBlockGrid(){
 }
 
 function resetBlockGrid(){
+  copyGridToFrames(blockGrid);
+  
   for (var i = 0; i < nBlocks; i++) {
     for (var j = 0; j < nBlocks; j++){
     	blockGrid[i][j] = 0;
@@ -276,7 +280,9 @@ function getShadowData() {
         		
         var distance = pixelDistance(rCurrent, gCurrent, bCurrent, rBackground, gBackground, bBackground);        
         
-        var blockSize = w/nBlocks; //64
+        // This gets referenced by the sequencer.
+        blockSize = w/nBlocks; //64
+        
         var threshold = (blockSize*blockSize)/2;
         var w = rawCanvas.width; //640
         var pixelNumber = i/4;
