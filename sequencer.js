@@ -68,11 +68,11 @@ var svg = d3.select("div#sequencer")
     .attr("width", width)
     .attr("height", height);
 
-// Threshold for considering a cell "on".
-var threshValue = 0;
+//Maximum value for a cell.
+var maxValue;
 
-// Maximum value for a cell.
-var maxValue = 0;
+// Threshold for considering a cell "on".
+var threshValue;
 
 function translate(x, y) {
   return "translate(" + x + ", " + y + ")";
@@ -144,10 +144,10 @@ function renderFrames(container, frames) {
   container.attr("height", height);
 
   // TODO: These shouldn't chage once they're set...
+  maxValue = (blockSize * blockSize) / (scaleFactor * scaleFactor);
+  threshValue = (maxValue / 2);
   columnWidth = (width / frames.length);
   cellHeight = (height / frames[0].length);
-  maxValue = (blockSize * blockSize);
-  threshValue = (maxValue / 2);
 
   // Set up the sequencer visualization.
   var columns = container
