@@ -17,24 +17,52 @@ var frames = [
     [0,0,0,0,0,0,0,0,0,0],
     ];
 
+var flute_files = [
+	"flute1.mp3",
+	"flute2.mp3",
+	"flute3.mp3",
+	"flute4.mp3",
+	"flute5.mp3",
+	"flute6.mp3",
+	"flute7.mp3",
+	"flute8.mp3",
+	"flute9.mp3",
+	"flute10.mp3",
+];
+
+var viola_files = [
+	"viola1.mp3",
+	"viola2.mp3",
+	"viola3.mp3",
+	"viola4.mp3",
+	"viola5.mp3",
+	"viola6.mp3",
+	"viola7.mp3",
+	"viola8.mp3",
+	"viola9.mp3",
+	"viola10.mp3",
+
+];
+
+
 // List of samples to load.
-var sample_files = [
-    "media/Mildon Lite Piano 024 127.ogg",
-    "media/Mildon Lite Piano 031 127.ogg",
-    "media/Mildon Lite Piano 036 127.ogg",
-    "media/Mildon Lite Piano 038 127.ogg",
-    "media/Mildon Lite Piano 040 127.ogg",
-    "media/Mildon Lite Piano 041 127.ogg",
-    "media/Mildon Lite Piano 043 127.ogg",
-    "media/Mildon Lite Piano 045 127.ogg",
-    "media/Mildon Lite Piano 047 127.ogg",
-    "media/Mildon Lite Piano 048 127.ogg",
-    "media/Mildon Lite Piano 050 127.ogg",
-    "media/Mildon Lite Piano 052 127.ogg",
-    "media/Mildon Lite Piano 053 127.ogg",
-    "media/Mildon Lite Piano 055 127.ogg",
-    "media/Mildon Lite Piano 057 127.ogg",
-    "media/Mildon Lite Piano 059 127.ogg",
+var piano_files = [
+//    "media/Mildon Lite Piano 024 127.ogg",
+//    "media/Mildon Lite Piano 031 127.ogg",
+//    "media/Mildon Lite Piano 036 127.ogg",
+//    "media/Mildon Lite Piano 038 127.ogg",
+//    "media/Mildon Lite Piano 040 127.ogg",
+//    "media/Mildon Lite Piano 041 127.ogg",
+//    "media/Mildon Lite Piano 043 127.ogg",
+//    "media/Mildon Lite Piano 045 127.ogg",
+//    "media/Mildon Lite Piano 047 127.ogg",
+//    "media/Mildon Lite Piano 048 127.ogg",
+//    "media/Mildon Lite Piano 050 127.ogg",
+//    "media/Mildon Lite Piano 052 127.ogg",
+//    "media/Mildon Lite Piano 053 127.ogg",
+//    "media/Mildon Lite Piano 055 127.ogg",
+//    "media/Mildon Lite Piano 057 127.ogg",
+//    "media/Mildon Lite Piano 059 127.ogg",
     "media/Mildon Lite Piano 060 127.ogg", // C4
     "media/Mildon Lite Piano 062 127.ogg", // D4
     "media/Mildon Lite Piano 064 127.ogg", // E4
@@ -45,17 +73,49 @@ var sample_files = [
     "media/Mildon Lite Piano 072 127.ogg",
     "media/Mildon Lite Piano 074 127.ogg",
     "media/Mildon Lite Piano 076 127.ogg",
-    "media/Mildon Lite Piano 077 127.ogg",
-    "media/Mildon Lite Piano 079 127.ogg",
-    "media/Mildon Lite Piano 081 127.ogg",
-    "media/Mildon Lite Piano 083 127.ogg",
-    "media/Mildon Lite Piano 084 127.ogg",
-    "media/Mildon Lite Piano 089 127.ogg",
-    "media/Mildon Lite Piano 095 127.ogg",
+//    "media/Mildon Lite Piano 077 127.ogg",
+//    "media/Mildon Lite Piano 079 127.ogg",
+//    "media/Mildon Lite Piano 081 127.ogg",
+//    "media/Mildon Lite Piano 083 127.ogg",
+//    "media/Mildon Lite Piano 084 127.ogg",
+//    "media/Mildon Lite Piano 089 127.ogg",
+//    "media/Mildon Lite Piano 095 127.ogg",
   ];
 
+
 // Select just the notes we need.
-sample_files = sample_files.slice(15, 25).reverse();
+sample_files = piano_files.reverse();
+//sample_files = flute_files.reverse();
+
+// Asynchronously load all the sample files.
+for (var i = 0; i < sample_files.length; i++) {
+  loadSoundAsync(i, sample_files[i]);
+}
+
+function piano(){	
+	sample_files = piano_files.reverse();
+	// Reload files for piano
+	for (var i = 0; i < sample_files.length; i++) {
+	  loadSoundAsync(i, sample_files[i]);
+	}
+}
+
+function flute(){
+	sample_files = flute_files.reverse();
+	// Reload files for flute
+	for (var i = 0; i < sample_files.length; i++) {
+	  loadSoundAsync(i, sample_files[i]);
+	}
+}
+
+function viola(){
+	sample_files = viola_files.reverse();
+	// Reload files for flute
+	for (var i = 0; i < sample_files.length; i++) {
+	  loadSoundAsync(i, sample_files[i]);
+	}
+}
+
 
 var bpm = 95;
 var tempo = 4;
@@ -120,11 +180,6 @@ function playNextFrame() {
 
 var currentFrame = 0;
 var looper = null;
-
-// Asynchronously load all the sample files.
-for (var i = 0; i < sample_files.length; i++) {
-  loadSoundAsync(i, sample_files[i]);
-}
 
 function initialSetup(container, frames) {
   var sequencer = d3.select("div#sequencer");

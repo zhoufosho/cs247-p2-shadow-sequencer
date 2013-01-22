@@ -37,9 +37,14 @@ div#controls {
 </head>
 <body>
     <div id="controls">
+    	<span style="font-family:Helvetica;font-size:14px;font-style:normal;font-weight:normal;text-decoration:none;text-transform:none;color:ffffff;">Controls:</span>
 		<input type="button" onClick="startLooping()" value="Start" />
 		<input type="button" onClick="stopLooping()" value="Stop" />
-        <button id="background">Capture Background!</button>
+        <button id="background">Capture Background</button>
+		<span style="font-family:Helvetica;font-size:14px;font-style:normal;font-weight:normal;text-decoration:none;text-transform:none;color:ffffff;">Instruments:</span>
+        <input type="button" onClick="piano()" value="Piano" />
+        <input type="button" onClick="flute()" value="Flute" />
+        <input type="button" onClick="viola()" value="Viola" />
 	</div>
 	<div id="sequencer" style="width: 100%; height: 100%;"></div>
     <div id="capture" style="display: none;"></div>
