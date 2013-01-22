@@ -116,6 +116,10 @@ function viola(){
 	}
 }
 
+function toggleSingleNote() {
+  playFirstNote = !playFirstNote;
+}
+
 
 var bpm = 95;
 var tempo = 4;
@@ -139,18 +143,16 @@ function translate(x, y) {
   return "translate(" + x + ", " + y + ")";
 }
 
-// Starts playing frames.
-function startLooping() {
-  if (looper == null) {
-      looper = setInterval("playNextFrame()", interval);
-  }
-}
+function toggleLooping(button) {
+  button = d3.select(button);
 
-// Stops playing frames.
-function stopLooping() {
-  if (looper != null) {
-      clearInterval(looper);
-      looper = null;
+  if (looper == null) {
+    button.attr("value", "Pause");
+    looper = setInterval("playNextFrame()", interval);
+  } else {
+    button.attr("value", "Play");
+    clearInterval(looper);
+    looper = null;
   }
 }
 
@@ -162,7 +164,7 @@ function playNextFrame() {
     currentFrame = 0;
   }
 
-  renderFrames(svg, frames);
+  renderFrames();
 
   var frame = frames[currentFrame];
   for (var i = 0; i < frame.length; i++) {
@@ -181,25 +183,28 @@ function playNextFrame() {
 var currentFrame = 0;
 var looper = null;
 
-function initialSetup(container, frames) {
+function initialSetup() {
   var sequencer = d3.select("div#sequencer");
 
   // Scale the container to match the window size.
   width = sequencer.property("clientWidth");
   height = sequencer.property("clientHeight");
-  
-  container.attr("width", width);
-  container.attr("height", height);
-  
+
+  svg.attr("width", width);
+  svg.attr("height", height);
+
   columnWidth = (width / frames.length);
   cellHeight = (height / frames[0].length);
-  
+
   // Calculate the threshold value for blocks.
   maxValue = (blockSize * blockSize) / (scaleFactor * scaleFactor);
   threshValue = (maxValue / 2);
 
+  // Clear any existing blocks.
+  svg.selectAll("g.frame").remove();
+
   // Set up the sequencer visualization.
-  var columns = container
+  var columns = svg
     .selectAll("g.frame")
     .data(frames);
 
@@ -231,21 +236,30 @@ function initialSetup(container, frames) {
         .style("fill", "#ddd")
         .on("click", function (d, cellNum) {
           frames[frameNum][cellNum] = maxValue;
-          renderFrames(container, frames);
+          renderFrames();
         });
   });
 }
 
 var highlightedFrame = -1;
 
-function renderFrames(container, frames) {
-  var columns = container
+function renderFrames() {
+  var sequencer = d3.select("div#sequencer");
+  var w = sequencer.property("clientWidth");
+  var h = sequencer.property("clientHeight");
+
+  // If the window size changed, re-initialize.
+  if ((svg.attr("width") != w) || (svg.attr("height") != h)) {
+    initialSetup();
+  }
+
+  var columns = svg
     .selectAll("g.frame")
     .data(frames);
-  
+
   columns.each(function(d, frameNum) {
     var sawNote = false;
-    
+
     d3.select(this).selectAll("rect.cell")
       .data(function(d) { return d; })
       .style("fill", function (d) {
@@ -254,7 +268,7 @@ function renderFrames(container, frames) {
         var h, s, l;
 
         var volume = (d / maxValue);
-        
+
         if (thresh) {
           h = (isCurrentFrame ? 150 /* green-cyan */ : 270 /* blue-magenta */);
           s = (volume * 50) + 50;
@@ -269,10 +283,10 @@ function renderFrames(container, frames) {
           h = 0;
           s = 0;
         }
-        
+
         // All blocks have luminosity based on threshold proximity.
         l = (volume * 25) + 25;
-  
+
         return "hsl(" + h + ", " + s + "%, " + l + "%)";
       });
   });
@@ -282,20 +296,20 @@ function renderFrames(container, frames) {
     // Remove style from previous frame.
     var previousFrameSvg = columns.filter(function (d, i) { return (i == highlightedFrame); });
     var h = 120;
-    
+
     previousFrameSvg
       .select("rect.background")
       .transition()
       .duration(interval * (frames.length - 2))
       .style("fill", "hsl(" + h + ", 0%, 20%)");
-    
+
     // Apply style to current frame.
     var currentFrameSvg = columns.filter(function (d, i) { return (i == currentFrame); });
-    
+
     currentFrameSvg
       .select("rect.background")
       .style("fill", "hsl(" + h + ", 25%, 40%)");
-    
+
     highlightedFrame = currentFrame;
   }
 }
@@ -306,7 +320,7 @@ var padding = 2;
 var columnWidth;
 var cellHeight;
 
-function copyGridToFrames(grid) {
+function copyGridToFrames(grid, render) {
   frames = new Array(grid.length);
 
   for (var y = 0; y < grid.length; y++) {
@@ -317,11 +331,14 @@ function copyGridToFrames(grid) {
     }
   }
 
-  renderFrames(svg, frames);
+  if (render) {
+    renderFrames();
+  }
 }
 
 
 function initializeSequencer() {
-  initialSetup(svg, blockGrid);
-  copyGridToFrames(blockGrid);
+  copyGridToFrames(blockGrid, false);
+  initialSetup();
+  renderFrames();
 }

@@ -246,7 +246,7 @@ function initializeBlockGrid(){
 }
 
 function resetBlockGrid(){
-  copyGridToFrames(blockGrid);
+  copyGridToFrames(blockGrid, true);
   
   for (var i = 0; i < nRows; i++) {
     for (var j = 0; j < nCols; j++){
