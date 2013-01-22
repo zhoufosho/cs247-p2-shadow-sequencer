@@ -201,13 +201,13 @@ function renderFrames(container, frames) {
         var volume = (d / maxValue);
         
         if (thresh) {
-          h = (isCurrentFrame ? 210 /* cyan-blue */ : 270 /* blue-magenta */);
+          h = (isCurrentFrame ? 150 /* green-cyan */ : 270 /* blue-magenta */);
           s = (volume * 50) + 50;
 
           // If we're in "play first note only" mode,
           // then color the first block differently.
           if (!sawNote && playFirstNote) {
-            h = (isCurrentFrame ? 120 /* green */ : 150 /* green-cyan */);
+            h = (isCurrentFrame ? 90 /* yellow-green */ : 210 /* cyan-blue */);
             sawNote = true;
           }
         } else {
@@ -226,19 +226,20 @@ function renderFrames(container, frames) {
   if (highlightedFrame != currentFrame) {
     // Remove style from previous frame.
     var previousFrameSvg = columns.filter(function (d, i) { return (i == highlightedFrame); });
+    var h = 120;
     
     previousFrameSvg
       .select("rect.background")
       .transition()
       .duration(interval * (frames.length - 2))
-      .style("fill", "hsl(210, 0%, 20%)");
+      .style("fill", "hsl(" + h + ", 0%, 20%)");
     
     // Apply style to current frame.
     var currentFrameSvg = columns.filter(function (d, i) { return (i == currentFrame); });
     
     currentFrameSvg
       .select("rect.background")
-      .style("fill", "hsl(210, 50%, 50%)");
+      .style("fill", "hsl(" + h + ", 25%, 40%)");
     
     highlightedFrame = currentFrame;
   }
