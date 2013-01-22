@@ -68,6 +68,7 @@ $(document).ready(function() {
     $('#background').click(function() {
         setBackground();
         if (!started) {
+            started = true;
             renderShadow();
         }
     });
@@ -77,8 +78,6 @@ $(document).ready(function() {
  * Creates the video and canvas elements
  */
 function initializeDOMElements() {
-	alert(width+" , "+height);
-	
     video = document.createElement('video');
     video.setAttribute('autoplay', true);
     video.style.display = 'none';
