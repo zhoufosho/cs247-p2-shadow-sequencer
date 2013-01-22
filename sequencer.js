@@ -1,3 +1,4 @@
+// Whether to only play the first note in the frame.
 var playFirstNote = true;
 
 var frames = [
@@ -101,16 +102,7 @@ function playNextFrame() {
     currentFrame = 0;
   }
 
-  if (currentFrameSvg != null) {
-    currentFrameSvg
-      .style("fill-opacity", 0.5)
-      .transition()
-        .duration(interval * (frames.length - 2))
-        .style("fill-opacity", 0);
-  }
-
-  currentFrameSvg = d3.select("#frame_" + currentFrame);
-  currentFrameSvg.style("fill-opacity", 1.0);
+  renderFrames(svg, frames);
 
   var frame = frames[currentFrame];
   for (var i = 0; i < frame.length; i++) {
@@ -134,20 +126,22 @@ for (var i = 0; i < sample_files.length; i++) {
   loadSoundAsync(i, sample_files[i]);
 }
 
-function renderFrames(container, frames) {
+function initialSetup(container, frames) {
   var sequencer = d3.select("div#sequencer");
 
+  // Scale the container to match the window size.
   width = sequencer.property("clientWidth");
   height = sequencer.property("clientHeight");
-
+  
   container.attr("width", width);
   container.attr("height", height);
-
-  // TODO: These shouldn't chage once they're set...
-  maxValue = (blockSize * blockSize) / (scaleFactor * scaleFactor);
-  threshValue = (maxValue / 2);
+  
   columnWidth = (width / frames.length);
   cellHeight = (height / frames[0].length);
+  
+  // Calculate the threshold value for blocks.
+  maxValue = (blockSize * blockSize) / (scaleFactor * scaleFactor);
+  threshValue = (maxValue / 2);
 
   // Set up the sequencer visualization.
   var columns = container
@@ -159,48 +153,95 @@ function renderFrames(container, frames) {
       .attr("class", "frame")
       .attr("transform", function (d, i) { return translate((i * columnWidth), 0); })
       .append("rect")
+        .attr("class", "background")
         .attr("id", function (d, frameNum) { return "frame_" + frameNum; })
-        .attr("x", -padding)
-        .attr("y", -padding)
-        .attr("width", columnWidth + (padding * 2))
-        .attr("height", height + (padding * 2))
-        .style("fill", "#99d")
-        .style("fill-opacity", 0);
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", columnWidth)
+        .attr("height", height);
 
   columns.each(function (frameData, frameNum) {
-      var cells = d3.select(this)
-        .selectAll("rect.cell")
-        .data(frameData);
+    var cells = d3.select(this)
+      .selectAll("rect.cell")
+      .data(frameData);
 
-      cells.enter()
-        .append("rect")
-          .attr("class", "cell")
-          .attr("id", function (d, cellNum) { return "cell_" + frameNum + "_" + cellNum; })
-          .attr("x", padding)
-          .attr("y", function (d, i) { return (i * cellHeight) + padding; })
-          .attr("width", columnWidth - (padding * 2))
-          .attr("height", cellHeight - (padding * 2))
-          .style("fill", "#ddd")
-          .on("click", function (d, cellNum) {
-            frames[frameNum][cellNum] = maxValue;
-            renderFrames(container, frames);
-          });
+    cells.enter()
+      .append("rect")
+        .attr("class", "cell")
+        .attr("id", function (d, cellNum) { return "cell_" + frameNum + "_" + cellNum; })
+        .attr("x", padding)
+        .attr("y", function (d, i) { return (i * cellHeight) + padding; })
+        .attr("width", columnWidth - (padding * 2))
+        .attr("height", cellHeight - (padding * 2))
+        .style("fill", "#ddd")
+        .on("click", function (d, cellNum) {
+          frames[frameNum][cellNum] = maxValue;
+          renderFrames(container, frames);
+        });
+  });
+}
 
-      cells.style("fill", function (d) {
+var highlightedFrame = -1;
+
+function renderFrames(container, frames) {
+  var columns = container
+    .selectAll("g.frame")
+    .data(frames);
+  
+  columns.each(function(d, frameNum) {
+    var sawNote = false;
+    
+    d3.select(this).selectAll("rect.cell")
+      .data(function(d) { return d; })
+      .style("fill", function (d) {
+        var isCurrentFrame = (frameNum == currentFrame);
         var thresh = (d >= threshValue);
-        var r, g, b;
+        var h, s, l;
 
+        var volume = (d / maxValue);
+        
         if (thresh) {
-          var volume = (d - threshValue) / (maxValue - threshValue);
-          r = Math.round(255 - (60 * volume));
-          g = b = Math.round(60 * volume);
-        } else {
-          r = g = b = 208;
-        }
+          h = (isCurrentFrame ? 210 /* cyan-blue */ : 270 /* blue-magenta */);
+          s = (volume * 50) + 50;
 
-        return "rgb(" + r + ", " + g + ", " + b + ")";
+          // If we're in "play first note only" mode,
+          // then color the first block differently.
+          if (!sawNote && playFirstNote) {
+            h = (isCurrentFrame ? 120 /* green */ : 150 /* green-cyan */);
+            sawNote = true;
+          }
+        } else {
+          h = 0;
+          s = 0;
+        }
+        
+        // All blocks have luminosity based on threshold proximity.
+        l = (volume * 25) + 25;
+  
+        return "hsl(" + h + ", " + s + "%, " + l + "%)";
       });
-    });
+  });
+
+  // TODO: This is not good D3 style, but it's faster to code...
+  if (highlightedFrame != currentFrame) {
+    // Remove style from previous frame.
+    var previousFrameSvg = columns.filter(function (d, i) { return (i == highlightedFrame); });
+    
+    previousFrameSvg
+      .select("rect.background")
+      .transition()
+      .duration(interval * (frames.length - 2))
+      .style("fill", "hsl(210, 0%, 20%)");
+    
+    // Apply style to current frame.
+    var currentFrameSvg = columns.filter(function (d, i) { return (i == currentFrame); });
+    
+    currentFrameSvg
+      .select("rect.background")
+      .style("fill", "hsl(210, 50%, 50%)");
+    
+    highlightedFrame = currentFrame;
+  }
 }
 
 var padding = 2;
@@ -225,6 +266,6 @@ function copyGridToFrames(grid) {
 
 
 function initializeSequencer() {
-  // This automatically draws the cells.
+  initialSetup(svg, blockGrid);
   copyGridToFrames(blockGrid);
 }
