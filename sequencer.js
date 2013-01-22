@@ -158,7 +158,6 @@ function renderFrames(container, frames) {
     .append("g")
       .attr("class", "frame")
       .attr("transform", function (d, i) { return translate((i * columnWidth), 0); })
-      .attr("alpha", 0.5)
       .append("rect")
         .attr("id", function (d, frameNum) { return "frame_" + frameNum; })
         .attr("x", -padding)
@@ -181,7 +180,11 @@ function renderFrames(container, frames) {
           .attr("y", function (d, i) { return (i * cellHeight) + padding; })
           .attr("width", columnWidth - (padding * 2))
           .attr("height", cellHeight - (padding * 2))
-          .style("fill", "#ddd");
+          .style("fill", "#ddd")
+          .on("click", function (d, cellNum) {
+            frames[frameNum][cellNum] = maxValue;
+            renderFrames(container, frames);
+          });
 
       cells.style("fill", function (d) {
         var thresh = (d >= threshValue);
