@@ -1,0 +1,1 @@
+Project for CS 247 course, Winter quarter 2012-2013. Kinect-based sequencer.
